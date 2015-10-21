@@ -1,9 +1,24 @@
 %Modulo para Conectarse a Yahoo y extraer la info
-clear all; 
+clear all;
 clc;
+
+%Modulo para Conectarse a Yahoo y extraer la info
 conexion = yahoo; %Para conectarse a yahoo
 i = 0;
+% matriz de datos historicos diarios es de 209*2
 dataHist = fetch(conexion,'^MXX','Close',now-300,now,'d');
+
+%Datos
+prompt = {'Precio Strike', 'Tasa Libre Riesgo', 'Tiempo para expirar en años',...
+    'Volatilidad'};
+dlg_title = 'Input';
+num_lines = 1;
+user_input = inputdlg(prompt,dlg_title,num_lines); 
+PrecioStrike = str2num(user_input{1}); 
+TasaLibreRiesgo = str2num(user_input{2}); 
+TiempoExpiracion = str2num(user_input{3});
+Volatilidad = str2num(user_input{4});
+
 while true
   x = isconnection(conexion); %Checa si realmente esta conectado True si es asi
   data = fetch(conexion,'^MXX');%Baja una estructura con info
@@ -11,13 +26,8 @@ while true
   disp(data);
   pause(1);
   if i==10
-      %PrecioDeMercado,PrecioStrike,...
-                           %TasaLibreRiesgo,TiempoExpiracion,Volatilidad)
-                           %[Call_Delta, Put_Delta]
-                           %[CallTheta, PutTheta]
-                           %[CallRho, PutRho]
-                           %Vega , Gamma
-      Griegas=CalcGriegas(data.Last,44000,.05,.55,.1);
+                           
+      Griegas=CalcGriegas(data.Last,PrecioStrike,TasaLibreRiesgo,TiempoExpiracion,Volatilidad);
       X=char(strcat('Call Delta: ',num2str(Griegas(1))),strcat('Put Delta: ',num2str(Griegas(2))),...
              strcat('Call Theta: ',num2str(Griegas(3))),strcat('Put Theta: ',num2str(Griegas(4))),...
              strcat('Call Rho: ',num2str(Griegas(5))),strcat('Put Rho: ',num2str(Griegas(6))),...
